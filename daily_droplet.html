@@ -1698,7 +1698,17 @@ window.addEventListener('error', e=>{
 document.addEventListener('touchstart', ()=>{ try{ getAudioCtx(); _loadDropletBuffer(); _loadSplashBuffer(); }catch(e){} }, {once:true});
 document.addEventListener('click', ()=>{ try{ getAudioCtx(); _loadDropletBuffer(); _loadSplashBuffer(); }catch(e){} }, {once:true});
 
-buildKeyboard();setupWordZone();setupTrash();newGame();
+buildKeyboard();setupWordZone();setupTrash();
+// window._daily is set by the ES module (type="module") which is deferred.
+// We must wait for it before calling newGame(), otherwise the async puzzle
+// fetch fails silently and the word zone stays empty.
+(function waitForDaily(){
+  if(window._daily){
+    newGame();
+  } else {
+    setTimeout(waitForDaily, 50);
+  }
+})();
 
 // SFX toggle
 const sfxBtn = document.getElementById("sfx-btn");
