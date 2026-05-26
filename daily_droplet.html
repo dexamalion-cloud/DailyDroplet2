@@ -321,6 +321,11 @@ function getYesterdayUTCKey(){
 // Puzzle number is derived from a launch date constant.
 // Set this to the date you go live; that day will be puzzle #1.
 const DAILY_LAUNCH_DATE = "2026-06-01";
+// ── Game mode ─────────────────────────────────────────────────
+// Change this one line to switch between modes:
+//   "timed"     — original 90-second countdown
+//   "unlimited" — no timer, play until you click Finish
+const GAME_MODE = "unlimited";
 function getPuzzleNumber(dateKey){
   const a = new Date(DAILY_LAUNCH_DATE+"T00:00:00Z");
   const b = new Date(dateKey+"T00:00:00Z");
@@ -560,7 +565,7 @@ if(window._dropletPendingGame){
     </svg>
   </div>
   <div id="header-right">
-    <div id="timer-wrap"><div id="timer-label">TIME</div><div id="timer-display">1:30</div></div>
+    <div id="timer-wrap"><div id="timer-label">TIME</div><div id="timer-display">1:30</div><div id="puzzle-date-display" style="display:none;font-family:'Space Mono',monospace;font-size:11px;color:#4A7A99;text-align:right;margin-top:2px;letter-spacing:0.5px"></div></div>
     <div><div id="score-label">Score</div><div id="score-value">0</div></div>
   </div>
 </div>
@@ -575,6 +580,7 @@ if(window._dropletPendingGame){
 <div id="used-words"></div>
 <div id="bottom-action-row">
   <button id="new-game-btn" style="display:none">New game</button>
+  <button id="finish-btn" style="display:none;background:transparent;border:2px solid #1ABC9C;color:#1ABC9C;border-radius:6px;padding:8px 22px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.15s" onclick="finishGame()">✓ Finish</button>
   <div id="sound-bar">
     <button id="sfx-btn" title="Toggle sound">🔊</button>
   </div>
@@ -728,7 +734,7 @@ if(window._dropletPendingGame){
     </svg>
   </div>
   <div id="header-right">
-    <div id="timer-wrap"><div id="timer-label">TIME</div><div id="timer-display">1:30</div></div>
+    <div id="timer-wrap"><div id="timer-label">TIME</div><div id="timer-display">1:30</div><div id="puzzle-date-display" style="display:none;font-family:'Space Mono',monospace;font-size:11px;color:#4A7A99;text-align:right;margin-top:2px;letter-spacing:0.5px"></div></div>
     <div><div id="score-label">Score</div><div id="score-value">0</div></div>
   </div>
 </div>
@@ -743,6 +749,7 @@ if(window._dropletPendingGame){
 <div id="used-words"></div>
 <div id="bottom-action-row">
   <button id="new-game-btn" style="display:none">New game</button>
+  <button id="finish-btn" style="display:none;background:transparent;border:2px solid #1ABC9C;color:#1ABC9C;border-radius:6px;padding:8px 22px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.15s" onclick="finishGame()">✓ Finish</button>
   <div id="sound-bar">
     <button id="sfx-btn" title="Toggle sound">🔊</button>
   </div>
@@ -1492,6 +1499,7 @@ function buildKeyboard(){
 
 function formatTime(s){return Math.floor(s/60)+":"+(s%60<10?"0":"")+s%60;}
 function updateTimer(){
+  if(GAME_MODE === "unlimited") return;
   timeLeft--;
   const el=document.getElementById("timer-display");
   el.textContent=formatTime(timeLeft);
@@ -1646,6 +1654,7 @@ async function showAlreadyPlayed(prior){
 
 async function newGame(){
   if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
+  _autoSaveDone = false; // reset auto-save flag for new session
   // Clear any prior overlay
   document.getElementById("game-over-overlay").classList.remove("show");
   const _mm=document.getElementById("medal-msg");if(_mm){_mm.textContent="";_mm.className="";}
@@ -1678,12 +1687,38 @@ async function newGame(){
   document.getElementById("score-value").textContent="0";
   document.getElementById("used-words").innerHTML="";
   document.getElementById("word-zone").classList.remove("correct","broken");
-  timeLeft=90;
-  document.getElementById("timer-display").textContent=formatTime(timeLeft);
-  document.getElementById("timer-display").className="";
+
+  if(GAME_MODE === "unlimited"){
+    // Unlimited mode: hide timer, show puzzle date, show Finish button
+    document.getElementById("timer-wrap").style.opacity="0";
+    document.getElementById("timer-label").style.display="none";
+    document.getElementById("timer-display").style.display="none";
+    const dateEl = document.getElementById("puzzle-date-display");
+    if(dateEl){
+      const d = new Date(_dailyDateKey+"T12:00:00");
+      const month = d.toLocaleDateString('en-AU',{month:'short'}).toUpperCase();
+      const day = d.getDate();
+      dateEl.textContent = `#${_dailyPuzzleNumber} · ${month} ${day}`;
+      dateEl.style.display="block";
+      document.getElementById("timer-wrap").style.opacity="1";
+    }
+    const finBtn = document.getElementById("finish-btn");
+    if(finBtn) finBtn.style.display="";
+    timerInterval = null;
+  } else {
+    // Timed mode: normal 90-second countdown
+    document.getElementById("timer-label").style.display="";
+    document.getElementById("timer-display").style.display="";
+    document.getElementById("puzzle-date-display").style.display="none";
+    document.getElementById("finish-btn").style.display="none";
+    timeLeft=90;
+    document.getElementById("timer-display").textContent=formatTime(timeLeft);
+    document.getElementById("timer-display").className="";
+    timerInterval=setInterval(updateTimer,1000);
+  }
+
   updateChainDisplay();initWord();showHint("","");renderWord();
   gameActive=true;
-  timerInterval=setInterval(updateTimer,1000);
   calcPotentialWords(base);
 }
 
@@ -1693,6 +1728,37 @@ window.addEventListener('error', e=>{
     console.error('[Droplet] Const error at:', e.filename, 'line:', e.lineno, 'col:', e.colno, 'msg:', e.message);
   }
 });
+
+// ── Unlimited mode: manual finish ────────────────────────────
+function finishGame(){
+  if(!gameActive) return;
+  gameActive = false;
+  if(timerInterval){ clearInterval(timerInterval); timerInterval=null; }
+  // Hide finish button
+  const finBtn = document.getElementById("finish-btn");
+  if(finBtn) finBtn.style.display="none";
+  endGame();
+}
+
+// ── Auto-save on close/navigate away (unlimited mode) ────────
+// Uses both beforeunload and visibilitychange for maximum coverage.
+let _autoSaveDone = false;
+function _autoSave(){
+  if(!gameActive || _autoSaveDone || GAME_MODE !== "unlimited") return;
+  if(!_dailyDateKey || score === 0) return; // nothing worth saving
+  _autoSaveDone = true;
+  gameActive = false;
+  if(timerInterval){ clearInterval(timerInterval); timerInterval=null; }
+  // Record via the daily helper (fire-and-forget — we can't await here)
+  try {
+    const wordsScored = [...used].length;
+    const topWord = [...used].sort((a,b)=>b.length-a.length)[0]||'';
+    window._daily.recordDailyGame(_dailyDateKey, score, wordsScored, base, topWord, [...used]);
+    // Also save to localStorage immediately so the play-once gate works
+  } catch(e){}
+}
+document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='hidden') _autoSave(); });
+window.addEventListener('beforeunload', ()=>{ _autoSave(); });
 
 // Unlock audio on first touch/click
 document.addEventListener('touchstart', ()=>{ try{ getAudioCtx(); _loadDropletBuffer(); _loadSplashBuffer(); }catch(e){} }, {once:true});
@@ -1895,6 +1961,9 @@ function checkMedalAndCelebrate(newScore){
 let _origEndGame=endGame;
 endGame=function(){
   _origEndGame();
+  // Set end-screen title based on mode
+  const titleEl = document.getElementById('game-over-title');
+  if(titleEl) titleEl.textContent = GAME_MODE === "unlimited" ? "Nice work! 💧" : "Time's Up!";
   checkMedalAndCelebrate(score);
   saveScore(score,base);
   // Firebase tracking — queue if module not ready
