@@ -38,7 +38,7 @@ html{overscroll-behavior:none}
 #game-over-overlay.show{display:flex}
 #game-over-box{background:#0E1C2A;border:2px solid #2980B9;border-radius:16px;padding:2rem 2.5rem;text-align:center;max-width:320px;width:90%;animation:popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275)}
 @keyframes popIn{0%{transform:scale(0.6);opacity:0}100%{transform:scale(1);opacity:1}}
-#game-over-title{font-size:22px;font-weight:800;color:#85C1E9;margin-bottom:0.75rem;letter-spacing:-0.5px;white-space:nowrap}
+#game-over-title{font-size:18px;font-weight:800;color:#85C1E9;margin-bottom:0.75rem;letter-spacing:-0.5px;white-space:normal;word-break:break-word}
 #game-over-words-label{font-size:11px;color:#1B3A4B;letter-spacing:1px;text-transform:uppercase;margin-bottom:0.5rem}
 #game-over-words{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:1.25rem;min-height:28px}
 #game-over-score-label{font-size:11px;color:#1B3A4B;letter-spacing:1px;text-transform:uppercase;margin-bottom:0.25rem}
@@ -58,7 +58,7 @@ html{overscroll-behavior:none}
 #game-over-overlay.show{display:flex}
 #game-over-box{background:#0E1C2A;border:2px solid #2980B9;border-radius:16px;padding:2rem 2.5rem;text-align:center;max-width:320px;width:90%;animation:popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275)}
 @keyframes popIn{0%{transform:scale(0.6);opacity:0}100%{transform:scale(1);opacity:1}}
-#game-over-title{font-size:22px;font-weight:800;color:#85C1E9;margin-bottom:0.75rem;letter-spacing:-0.5px;white-space:nowrap}
+#game-over-title{font-size:18px;font-weight:800;color:#85C1E9;margin-bottom:0.75rem;letter-spacing:-0.5px;white-space:normal;word-break:break-word}
 #game-over-words-label{font-size:11px;color:#1B3A4B;letter-spacing:1px;text-transform:uppercase;margin-bottom:0.5rem}
 #game-over-words{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:1.25rem;min-height:28px}
 #game-over-score-label{font-size:11px;color:#1B3A4B;letter-spacing:1px;text-transform:uppercase;margin-bottom:0.25rem}
@@ -320,7 +320,7 @@ function getYesterdayUTCKey(){
 }
 // Puzzle number is derived from a launch date constant.
 // Set this to the date you go live; that day will be puzzle #1.
-const DAILY_LAUNCH_DATE = "2026-06-01";
+const DAILY_LAUNCH_DATE = "2026-05-26";
 // ── Game mode ─────────────────────────────────────────────────
 // Change this one line to switch between modes:
 //   "timed"     — original 90-second countdown
