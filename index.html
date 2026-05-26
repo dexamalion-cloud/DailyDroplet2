@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Droplet — A New Word Puzzle Every Day</title>
+<meta name="description" content="Daily Droplet is a free daily word game. Each day you get three base letters — drag, build, and score as many words as you can. One puzzle per day, shared by everyone.">
+<meta name="keywords" content="daily word game, word puzzle, droplet game, free word game, daily puzzle, word challenge">
+<meta property="og:title" content="Daily Droplet — A New Word Puzzle Every Day">
+<meta property="og:description" content="Each day, three letters. Build as many words as you can. Free to play, one puzzle a day.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7868756429762207" crossorigin="anonymous"></script>
+<style>
+  :root {
+    --bg:      #0A0F14;
+    --surface: #0E1C2A;
+    --surf2:   #122233;
+    --border:  #1B3A4B;
+    --steel:   #2980B9;
+    --ice:     #85C1E9;
+    --teal:    #1ABC9C;
+    --amber:   #F39C12;
+    --text:    #C8DCEA;
+    --muted:   #4A7A99;
+    --mono:    'Space Mono', monospace;
+    --sans:    'Syne', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── Noise texture overlay ───────────────────────── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  /* ── Nav ─────────────────────────────────────────── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    background: rgba(10,15,20,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    z-index: 100;
+    padding: 0 max(1.5rem, 5vw);
+    height: 58px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-logo {
+    font-weight: 800;
+    font-size: 1.05rem;
+    color: var(--ice);
+    letter-spacing: 0.5px;
+    text-decoration: none;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    transition: color 0.15s;
+  }
+  .nav-links a:hover { color: var(--ice); }
+  .nav-cta {
+    background: var(--steel) !important;
+    color: #fff !important;
+    padding: 0.45rem 1.1rem;
+    border-radius: 6px;
+    transition: background 0.15s !important;
+  }
+  .nav-cta:hover { background: #3498DB !important; }
+
+  /* ── Hero ────────────────────────────────────────── */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center;
+    padding: 7rem 1.5rem 4rem;
+    overflow: hidden;
+  }
+
+  /* Radial glow behind hero */
+  .hero::after {
+    content: '';
+    position: absolute;
+    top: 20%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(41,128,185,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-inner { position: relative; z-index: 1; max-width: 640px; }
+
+  .hero-eyebrow {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 1.5rem;
+    display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  }
+  .hero-eyebrow::before,
+  .hero-eyebrow::after {
+    content: '';
+    display: block;
+    width: 28px; height: 1px;
+    background: var(--teal);
+    opacity: 0.5;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.8rem, 8vw, 5rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -2px;
+    color: #fff;
+    margin-bottom: 1.5rem;
+  }
+  .hero h1 span { color: var(--ice); }
+
+  .hero-desc {
+    font-size: 1.1rem;
+    color: var(--muted);
+    max-width: 480px;
+    margin: 0 auto 2.5rem;
+    line-height: 1.7;
+  }
+
+  .hero-actions {
+    display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+  }
+
+  .btn-play {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: var(--steel);
+    color: #fff;
+    font-family: var(--sans);
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 0.85rem 2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .btn-play:hover { background: #3498DB; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(41,128,185,0.3); }
+
+  .btn-secondary {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: transparent;
+    color: var(--ice);
+    font-family: var(--sans);
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 0.85rem 2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+  }
+  .btn-secondary:hover { border-color: var(--steel); background: rgba(41,128,185,0.08); }
+
+  /* ── Floating tiles demo ─────────────────────────── */
+  .tile-demo {
+    display: flex; gap: 0.75rem; justify-content: center;
+    margin-bottom: 3rem;
+  }
+  .demo-tile {
+    width: 72px; height: 72px;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono);
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: var(--ice);
+    position: relative;
+    animation: float 3s ease-in-out infinite;
+  }
+  .demo-tile:nth-child(1) { border-color: var(--steel); animation-delay: 0s; }
+  .demo-tile:nth-child(2) { border-color: var(--border); background: var(--surf2); animation-delay: 0.4s; }
+  .demo-tile:nth-child(3) { border-color: var(--steel); animation-delay: 0.8s; }
+  .demo-tile .tile-sub {
+    position: absolute; bottom: 4px;
+    font-size: 0.48rem; letter-spacing: 1px;
+    color: var(--muted); text-transform: uppercase;
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  /* ── Scroll indicator ────────────────────────────── */
+  .scroll-hint {
+    position: absolute; bottom: 2.5rem; left: 50%;
+    transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    animation: fadeIn 2s 1s both;
+  }
+  .scroll-hint::after {
+    content: '';
+    display: block;
+    width: 1px; height: 40px;
+    background: linear-gradient(to bottom, var(--muted), transparent);
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  /* ── Sections ────────────────────────────────────── */
+  section {
+    position: relative;
+    padding: 5rem max(1.5rem, 6vw);
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 1rem;
+  }
+  .section-title {
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.5px;
+    margin-bottom: 1.25rem;
+    line-height: 1.2;
+  }
+  .section-body {
+    color: var(--muted);
+    font-size: 1rem;
+    line-height: 1.8;
+    max-width: 620px;
+  }
+  .section-body p + p { margin-top: 1rem; }
+
+  /* ── Divider ─────────────────────────────────────── */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 0 max(1.5rem, 6vw);
+  }
+
+  /* ── How to play ─────────────────────────────────── */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+  .step {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .step:hover { border-color: var(--steel); transform: translateY(-3px); }
+  .step-num {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    color: var(--teal);
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+  }
+  .step-title {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--ice);
+    margin-bottom: 0.5rem;
+  }
+  .step-body {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* ── Scoring table ───────────────────────────────── */
+  .scoring-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 3rem;
+  }
+  .score-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .score-icon { font-size: 1.5rem; flex-shrink: 0; }
+  .score-info {}
+  .score-pts {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--teal);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 0.15rem;
+  }
+  .score-desc {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* ── Features ────────────────────────────────────── */
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+  .feature {
+    padding: 1.5rem;
+    border-left: 2px solid var(--border);
+    transition: border-color 0.2s;
+  }
+  .feature:hover { border-color: var(--teal); }
+  .feature-icon { font-size: 1.4rem; margin-bottom: 0.75rem; }
+  .feature-title {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--ice);
+    margin-bottom: 0.4rem;
+  }
+  .feature-body {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* ── FAQ ─────────────────────────────────────────── */
+  .faq-list { margin-top: 2.5rem; }
+  .faq-item {
+    border-bottom: 1px solid var(--border);
+    padding: 1.5rem 0;
+  }
+  .faq-item:first-child { border-top: 1px solid var(--border); }
+  .faq-q {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--ice);
+    margin-bottom: 0.6rem;
+  }
+  .faq-a {
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.75;
+    max-width: 680px;
+  }
+
+  /* ── CTA banner ──────────────────────────────────── */
+  .cta-banner {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 3rem 2rem;
+    text-align: center;
+    margin: 0 max(1.5rem, 6vw) 5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-banner::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(41,128,185,0.1) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .cta-banner h2 {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.5px;
+    margin-bottom: 0.75rem;
+  }
+  .cta-banner p {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+    line-height: 1.7;
+  }
+
+  /* ── Footer ──────────────────────────────────────── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2.5rem max(1.5rem, 6vw);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+  footer a { color: var(--muted); text-decoration: none; }
+  footer a:hover { color: var(--ice); }
+  .footer-links { display: flex; gap: 1.5rem; }
+
+  /* ── Ad slots ────────────────────────────────────── */
+  .ad-slot {
+    width: 100%;
+    max-width: 728px;
+    margin: 0 auto;
+    padding: 1rem max(1.5rem, 6vw);
+    text-align: center;
+  }
+  .ad-slot ins { display: block; }
+
+  @media (max-width: 600px) {
+    .nav-links a:not(.nav-cta) { display: none; }
+    .tile-demo .demo-tile { width: 58px; height: 58px; font-size: 1.5rem; }
+    footer { flex-direction: column; text-align: center; }
+    .footer-links { justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav>
+  <a class="nav-logo" href="#">💧 Daily Droplet</a>
+  <div class="nav-links">
+    <a href="#how-to-play">How to play</a>
+    <a href="#scoring">Scoring</a>
+    <a href="#faq">FAQ</a>
+    <a href="daily_droplet.html" class="nav-cta">Play today</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Free · Daily · Word puzzle</div>
+
+    <div class="tile-demo" aria-hidden="true">
+      <div class="demo-tile">T<span class="tile-sub">C1</span></div>
+      <div class="demo-tile">A<span class="tile-sub">VOW</span></div>
+      <div class="demo-tile">R<span class="tile-sub">C2</span></div>
+    </div>
+
+    <h1>A new word puzzle<br><span>every single day.</span></h1>
+
+    <p class="hero-desc">
+      Three letters. One day. How many words can you build?
+      Daily Droplet gives you a fresh set of base letters each morning —
+      drag, arrange, and score as many words as you can find.
+    </p>
+
+    <div class="hero-actions">
+      <a href="daily_droplet.html" class="btn-play">💧 Play today's puzzle</a>
+      <a href="#how-to-play" class="btn-secondary">How it works ↓</a>
+    </div>
+  </div>
+
+  <div class="scroll-hint" aria-hidden="true">Scroll</div>
+</header>
+
+<!-- Ad slot 1: Below hero -->
+<div class="ad-slot">
+  <!-- ADSENSE_LANDING_TOP -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-7868756429762207"
+       data-ad-slot="ADSENSE_LANDING_TOP"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+</div>
+
+<!-- How to play -->
+<section id="how-to-play">
+  <div class="section-label">Getting started</div>
+  <h2 class="section-title">How to play Daily Droplet</h2>
+  <div class="section-body">
+    <p>
+      Each day you receive three base letters — two consonants and a vowel —
+      arranged in a fixed order. Your goal is to build as many valid English
+      words as possible that contain those three letters as an ordered sequence.
+    </p>
+    <p>
+      You can add letters before, between, or after the base letters using the
+      on-screen keyboard. Drag letters into any gap in the word zone, or tap to
+      append them to the end. Once you're happy with a word, it scores automatically.
+    </p>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">Step 01</div>
+      <div class="step-title">Get your three letters</div>
+      <div class="step-body">Every day at midnight UTC, a new set of base letters is revealed. Everyone in the world plays the same puzzle that day.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">Step 02</div>
+      <div class="step-title">Build words</div>
+      <div class="step-body">Drag letters from the keyboard into the word zone. The base letters must appear in order somewhere in your word — add as many extra letters as you like around them.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">Step 03</div>
+      <div class="step-title">Score & chain</div>
+      <div class="step-body">Valid words score points. Build chain bonuses by extending a word you've already scored — adding one more letter to the end gives you a multiplier.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">Step 04</div>
+      <div class="step-title">Finish & share</div>
+      <div class="step-body">When you're satisfied with your score, hit Finish. Your result is saved and you can share it with friends — one attempt per day.</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- Scoring -->
+<section id="scoring">
+  <div class="section-label">Points system</div>
+  <h2 class="section-title">How scoring works</h2>
+  <div class="section-body">
+    <p>
+      Every valid word you find scores at least one point. Longer words and chain
+      sequences reward more ambitious play, and rare letters like J, X, Q, and Z
+      add bonus points on top.
+    </p>
+  </div>
+
+  <div class="scoring-grid">
+    <div class="score-card">
+      <div class="score-icon">📝</div>
+      <div class="score-info">
+        <div class="score-pts">+1 point</div>
+        <div class="score-desc">Any valid word containing the base letters in order</div>
+      </div>
+    </div>
+    <div class="score-card">
+      <div class="score-icon">⚡</div>
+      <div class="score-info">
+        <div class="score-pts">Chain bonus</div>
+        <div class="score-desc">Add a letter to a word you've already scored to earn 1 + (N×2) extra points</div>
+      </div>
+    </div>
+    <div class="score-card">
+      <div class="score-icon">🐟</div>
+      <div class="score-info">
+        <div class="score-pts">+1 bonus</div>
+        <div class="score-desc">Words of 7 or more letters — a fish animation plays</div>
+      </div>
+    </div>
+    <div class="score-card">
+      <div class="score-icon">🐠</div>
+      <div class="score-info">
+        <div class="score-pts">+3 bonus</div>
+        <div class="score-desc">Words of 10 or more letters</div>
+      </div>
+    </div>
+    <div class="score-card">
+      <div class="score-icon">💎</div>
+      <div class="score-info">
+        <div class="score-pts">+3 per letter</div>
+        <div class="score-desc">Tough letters J, X, Q (as QU), and Z each add three bonus points</div>
+      </div>
+    </div>
+    <div class="score-card">
+      <div class="score-icon">🔥</div>
+      <div class="score-info">
+        <div class="score-pts">Streak bonus</div>
+        <div class="score-desc">Play on consecutive days to build your daily streak</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- Ad slot 2: Mid-page -->
+<div class="ad-slot">
+  <!-- ADSENSE_LANDING_MID -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-7868756429762207"
+       data-ad-slot="ADSENSE_LANDING_MID"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+</div>
+
+<!-- Features -->
+<section id="features">
+  <div class="section-label">What makes it different</div>
+  <h2 class="section-title">Built for word lovers</h2>
+  <div class="section-body">
+    <p>Daily Droplet is more than a timer and a score. It's designed to reward depth of vocabulary, creative thinking, and the satisfaction of finding a word no one else thought of.</p>
+  </div>
+
+  <div class="features">
+    <div class="feature">
+      <div class="feature-icon">📅</div>
+      <div class="feature-title">One puzzle a day</div>
+      <div class="feature-body">A fresh puzzle unlocks every day at midnight UTC. Everyone plays the same letters, so you can compare scores with friends fairly.</div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">🌊</div>
+      <div class="feature-title">152,000+ word dictionary</div>
+      <div class="feature-body">Powered by the ENABLE lexicon — the same word list used by many competitive word games — extended with Australian and British spellings and modern vocabulary.</div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">🎯</div>
+      <div class="feature-title">No time pressure</div>
+      <div class="feature-body">Unlike timed word games, Daily Droplet lets you think at your own pace. Play for five minutes or an hour — the puzzle is yours for the whole day.</div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">🔗</div>
+      <div class="feature-title">Chain system</div>
+      <div class="feature-body">The chain mechanic rewards extending words you've already found. Spot a longer form of a word you scored and you'll earn a compounding bonus.</div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">📊</div>
+      <div class="feature-title">Global leaderboard</div>
+      <div class="feature-body">See how your score compares against everyone who played that day's puzzle. A new leaderboard resets with each daily puzzle.</div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">📤</div>
+      <div class="feature-title">Easy sharing</div>
+      <div class="feature-body">Share your result with a single tap — a clean emoji summary of your score and words, ready to post or send to friends.</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="section-label">Common questions</div>
+  <h2 class="section-title">Frequently asked questions</h2>
+
+  <div class="faq-list">
+    <div class="faq-item">
+      <div class="faq-q">How are the daily letters chosen?</div>
+      <div class="faq-a">Each day's puzzle is hand-curated or algorithmically selected to ensure at least 1,300 possible valid words can be formed from the base letters. This guarantees every puzzle is solvable and rewarding, regardless of skill level.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Can I play more than once a day?</div>
+      <div class="faq-a">Each puzzle can only be played once per day per device. Once you finish and submit your score, your result is saved and you can see the end-of-day screen until the next puzzle drops. This keeps the leaderboard fair.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">When does the daily puzzle reset?</div>
+      <div class="faq-a">A new puzzle becomes available at midnight UTC every day. For players in Australia (AEST/AEDT), that's 10:00 AM or 11:00 AM depending on daylight saving time.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What counts as a valid word?</div>
+      <div class="faq-a">Words must appear in the ENABLE dictionary (152,481 words), which covers standard English including many British and Australian spellings. The base letters must appear in order somewhere within the word — for example, if your base is T·A·R, then "star", "guitar", and "starboard" all qualify.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Is Daily Droplet free to play?</div>
+      <div class="faq-a">Yes, completely free. No account required, no downloads, no subscriptions. Just open the page and play.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Does it work on mobile?</div>
+      <div class="faq-a">Daily Droplet is designed for both desktop and mobile. On mobile, tap a key to add it to the end of your word, or hold and drag to insert it at a specific position.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">How do chain bonuses work?</div>
+      <div class="faq-a">If you've already scored a word and then find a longer word that extends it by adding one or more letters, you earn a chain bonus. The bonus is 1 + (chain length × 2) points on top of the base word score. Chains reset if you attempt an invalid word, remove a letter, or press Clear.</div>
+    </div>
+  </div>
+</section>
+
+<!-- Ad slot 3: Before CTA -->
+<div class="ad-slot">
+  <!-- ADSENSE_LANDING_BOTTOM -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-7868756429762207"
+       data-ad-slot="ADSENSE_LANDING_BOTTOM"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+</div>
+
+<!-- CTA -->
+<div class="cta-banner">
+  <h2>Ready to play today's puzzle?</h2>
+  <p>A new set of letters is waiting. How many words can you find?</p>
+  <a href="daily_droplet.html" class="btn-play" style="display:inline-flex">💧 Play now — it's free</a>
+</div>
+
+<!-- Footer -->
+<footer>
+  <div>
+    <strong style="color:var(--ice)">💧 Daily Droplet</strong> &nbsp;·&nbsp;
+    A free daily word puzzle
+  </div>
+  <div class="footer-links">
+    <a href="#how-to-play">How to play</a>
+    <a href="#faq">FAQ</a>
+    <a href="daily_droplet.html">Play</a>
+    <a href="privacy.html">Privacy</a>
+  </div>
+</footer>
+
+</body>
+</html>
