@@ -522,7 +522,6 @@ if(window._dropletPendingGame){
     <div id="medal-msg"></div>
     <div id="daily-streak" style="font-size:14px;color:#85C1E9;margin-bottom:0.5rem;min-height:18px"></div>
     <div id="daily-rank" style="font-size:12px;color:#1B3A4B;margin-bottom:0.75rem;min-height:14px"></div>
-    <div id="daily-countdown" style="font-size:12px;color:#85C1E9;font-family:'Space Mono',monospace;margin-bottom:1rem;min-height:16px"></div>
     <button id="share-btn">📤 Share my score</button>
     <!-- Game over ad slot — replace inner div with AdSense unit when approved -->
     <div id="ad-gameover">
@@ -649,11 +648,6 @@ if(window._dropletPendingGame){
       <div class="score-rule-pts">+3 Points</div>
     </div>
 
-    <div class="score-section-title">Timer</div>
-    <div class="score-rule">
-      <div><div class="score-rule-label">90 seconds</div><div class="score-rule-desc">Score as many words as you can!</div></div>
-      <div class="score-rule-pts">⏱</div>
-    </div>
   </div>
 </div>
 
@@ -691,7 +685,6 @@ if(window._dropletPendingGame){
     <div id="medal-msg"></div>
     <div id="daily-streak" style="font-size:14px;color:#85C1E9;margin-bottom:0.5rem;min-height:18px"></div>
     <div id="daily-rank" style="font-size:12px;color:#1B3A4B;margin-bottom:0.75rem;min-height:14px"></div>
-    <div id="daily-countdown" style="font-size:12px;color:#85C1E9;font-family:'Space Mono',monospace;margin-bottom:1rem;min-height:16px"></div>
     <button id="share-btn">📤 Share my score</button>
     <!-- Game over ad slot — replace inner div with AdSense unit when approved -->
     <div id="ad-gameover">
@@ -818,11 +811,6 @@ if(window._dropletPendingGame){
       <div class="score-rule-pts">+3 Points</div>
     </div>
 
-    <div class="score-section-title">Timer</div>
-    <div class="score-rule">
-      <div><div class="score-rule-label">90 seconds</div><div class="score-rule-desc">Score as many words as you can!</div></div>
-      <div class="score-rule-pts">⏱</div>
-    </div>
   </div>
 </div>
 
@@ -1571,35 +1559,6 @@ function endGame(){
 // and a play-once gate.
 let _dailyDateKey = null;
 let _dailyPuzzleNumber = 0;
-let _countdownInterval = null;
-
-function _formatCountdown(ms){
-  if(ms < 0) ms = 0;
-  const h = Math.floor(ms / 3600000);
-  const m = Math.floor((ms % 3600000) / 60000);
-  const s = Math.floor((ms % 60000) / 1000);
-  return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
-}
-function _msUntilNextUTCDay(){
-  const now = new Date();
-  const tmw = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()+1, 0, 0, 0));
-  return tmw - now;
-}
-function startCountdown(){
-  const el = document.getElementById('daily-countdown');
-  if(!el) return;
-  function tick(){
-    const ms = _msUntilNextUTCDay();
-    el.textContent = '⏱ Next puzzle in '+_formatCountdown(ms);
-    if(ms <= 1000){
-      // New day — reload after a brief delay
-      setTimeout(()=>location.reload(), 1500);
-    }
-  }
-  tick();
-  if(_countdownInterval) clearInterval(_countdownInterval);
-  _countdownInterval = setInterval(tick, 1000);
-}
 
 // Show the "already played" screen by populating the game-over overlay
 // with the prior result and skipping a fresh game.
@@ -1650,7 +1609,6 @@ async function showAlreadyPlayed(prior){
   } else {
     document.getElementById('daily-rank').textContent = '';
   }
-  startCountdown();
   document.getElementById('game-over-overlay').classList.add('show');
 }
 
@@ -2004,8 +1962,7 @@ endGame=function(){
           rankEl.textContent = summary.totalPlayers+' player'+(summary.totalPlayers!==1?'s':'')+' today · top score '+summary.topScore;
         }
       }
-      startCountdown();
-    } catch(e){ }
+        } catch(e){ }
   })();
 };
 
