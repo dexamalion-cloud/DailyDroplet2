@@ -564,7 +564,7 @@ if(window._dropletPendingGame){
     </svg>
   </div>
   <div id="header-right">
-    <div id="timer-wrap"><div id="timer-label">TIME</div><div id="timer-display">1:30</div><div id="puzzle-date-display" style="display:none;font-family:'Space Mono',monospace;font-size:11px;color:#4A7A99;text-align:right;margin-top:2px;letter-spacing:0.5px"></div></div>
+    <div id="timer-wrap" style="display:none"><div id="timer-label">TIME</div><div id="timer-display">1:30</div><div id="puzzle-date-display" style="display:none;font-family:'Space Mono',monospace;font-size:11px;color:#4A7A99;text-align:right;margin-top:2px;letter-spacing:0.5px"></div></div>
     <div><div id="score-label">Score</div><div id="score-value">0</div></div>
   </div>
 </div>
@@ -727,7 +727,7 @@ if(window._dropletPendingGame){
     </svg>
   </div>
   <div id="header-right">
-    <div id="timer-wrap"><div id="timer-label">TIME</div><div id="timer-display">1:30</div><div id="puzzle-date-display" style="display:none;font-family:'Space Mono',monospace;font-size:11px;color:#4A7A99;text-align:right;margin-top:2px;letter-spacing:0.5px"></div></div>
+    <div id="timer-wrap" style="display:none"><div id="timer-label">TIME</div><div id="timer-display">1:30</div><div id="puzzle-date-display" style="display:none;font-family:'Space Mono',monospace;font-size:11px;color:#4A7A99;text-align:right;margin-top:2px;letter-spacing:0.5px"></div></div>
     <div><div id="score-label">Score</div><div id="score-value">0</div></div>
   </div>
 </div>
@@ -1649,10 +1649,8 @@ async function newGame(){
   document.getElementById("word-zone").classList.remove("correct","broken");
 
   if(GAME_MODE === "unlimited"){
-    // Unlimited mode: hide timer, show puzzle date, show Finish button
-    document.getElementById("timer-wrap").style.opacity="0";
-    document.getElementById("timer-label").style.display="none";
-    document.getElementById("timer-display").style.display="none";
+    // Unlimited mode: hide timer entirely, show puzzle date in its place
+    document.getElementById("timer-wrap").style.display="none";
     const dateEl = document.getElementById("puzzle-date-display");
     if(dateEl){
       const d = new Date(_dailyDateKey+"T12:00:00");
@@ -1660,13 +1658,14 @@ async function newGame(){
       const day = d.getDate();
       dateEl.textContent = `#${_dailyPuzzleNumber} · ${month} ${day}`;
       dateEl.style.display="block";
-      document.getElementById("timer-wrap").style.opacity="1";
+      document.getElementById("timer-wrap").style.display="";
     }
     const finBtn = document.getElementById("finish-btn");
     if(finBtn) finBtn.style.display="";
     timerInterval = null;
   } else {
-    // Timed mode: normal 90-second countdown
+    // Timed mode: show timer normally
+    document.getElementById("timer-wrap").style.display="";
     document.getElementById("timer-label").style.display="";
     document.getElementById("timer-display").style.display="";
     document.getElementById("puzzle-date-display").style.display="none";
