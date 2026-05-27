@@ -86,12 +86,12 @@ html{overscroll-behavior:none}
 #word-zone.drag-over{border-color:#2980B9;background:#0E1C2A}
 #word-zone.correct{border-color:#1ABC9C;background:#0A1E2A}
 #word-zone.broken{border-color:#85C1E9;background:#0E1C2A}
-.word-letter{width:48px;height:56px;background:#0A0F14;border:2px solid #1B3A4B;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;font-family:'Space Mono',monospace;user-select:none;flex-shrink:0;transition:width 0.2s,height 0.2s,font-size 0.2s,transform 0.15s;color:#fff;text-transform:uppercase}
+.word-letter{width:48px;height:56px;background:#0A0F14;border:2px solid #1B3A4B;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;font-family:'Space Mono',monospace;user-select:none;flex-shrink:0;transition:width 0.12s,height 0.12s,font-size 0.12s,transform 0.09s;color:#fff;text-transform:uppercase}
 .word-letter.base-letter{background:#0A0F14;border:2px solid #85C1E9;color:#85C1E9}
 .word-letter.added-letter{cursor:grab;border-color:#2980B9;color:#fff}
 .word-letter.added-letter:hover{transform:translateY(-2px);background:#0E1C2A}
 .word-letter.added-letter.dragging{opacity:0.4;transform:scale(0.95)}
-.gap-indicator{width:4px;height:56px;background:transparent;flex-shrink:0;border-radius:4px;transition:width 0.15s ease,height 0.2s,background 0.15s ease}
+.gap-indicator{width:4px;height:56px;background:transparent;flex-shrink:0;border-radius:4px;transition:width 0.09s ease,height 0.12s,background 0.09s ease}
 .gap-indicator.open{width:44px;background:#2980B944}
 /* Tile sizing by word length */
 #word-zone.len-s  .word-letter{width:48px;height:56px;font-size:22px}
@@ -969,17 +969,19 @@ function getInsertIdx(clientX){
   const zone=document.getElementById("word-zone");
   const tiles=[...zone.querySelectorAll(".word-letter")];
   if(!tiles.length) return 0;
-  // Before first tile
+  // Use a left-biased reference: the drop should feel like the LEFT edge
+  // of the dragged letter determines the slot, not its centre.
+  // Shifting the boundary 30% left of each tile achieves this.
   const firstR=tiles[0].getBoundingClientRect();
-  if(clientX < firstR.left + firstR.width*0.5) return 0;
-  // After last tile
+  if(clientX < firstR.left + firstR.width*0.25) return 0;
   const lastR=tiles[tiles.length-1].getBoundingClientRect();
-  if(clientX > lastR.left + lastR.width*0.5) return tiles.length;
-  // Between tiles — find the gap closest to clientX
+  if(clientX > lastR.left + lastR.width*0.75) return tiles.length;
+  // Between tiles — boundary is 30% into the right tile (biased left)
   for(let i=0;i<tiles.length-1;i++){
     const rA=tiles[i].getBoundingClientRect();
     const rB=tiles[i+1].getBoundingClientRect();
-    if(clientX <= (rA.right + rB.left)/2) return i+1;
+    const boundary = rA.right + (rB.width) * 0.3;
+    if(clientX <= boundary) return i+1;
   }
   return tiles.length;
 }
